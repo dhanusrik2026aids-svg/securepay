@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SecurePay — College Event Payment & Transaction Monitoring</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            navy: {
+              950: '#040B1A',
+              900: '#0A192F',
+              800: '#112240',
+              700: '#1D3557',
+            },
+            skybrand: {
+              50: '#F0F7FF',
+              100: '#E0EFFF',
+              500: '#0284C7',
+              600: '#0369A1',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body { background-color: #F4F7FB; color: #0F172A; }
+    .fade-in { animation: fadeIn 0.25s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .glass-card { background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(10px); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #F1F5F9; }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+  </style>
+</head>
+<body class="antialiased selection:bg-sky-600 selection:text-white">
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- ================= LANDING PAGE VIEW ================= -->
+  <div id="view-landing" class="min-h-screen flex flex-col">
+    <!-- Top Navbar -->
+    <header class="bg-navy-900 text-white border-b border-navy-800 sticky top-0 z-30">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+            </svg>
+          </div>
+          <div>
+            <span class="font-bold text-lg tracking-tight">Secure<span class="text-sky-400">Pay</span></span>
+            <span class="hidden sm:inline-block ml-2 text-[11px] uppercase tracking-wider px-2 py-0.5 rounded bg-navy-800 text-sky-300 border border-navy-700">Campus Guard</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="openAuthModal('login')" class="px-4 py-2 text-sm font-medium text-slate-200 hover:text-white transition">Sign In</button>
+          <button onclick="openAuthModal('register')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-sky-500 hover:bg-sky-400 text-navy-950 transition shadow-md shadow-sky-500/20">Student Register</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-b from-navy-900 via-navy-900 to-navy-800 text-white py-16 sm:py-24 px-4 relative overflow-hidden">
+      <div class="max-w-7xl mx-auto grid lg:grid-cols-12 gap-12 items-center relative z-10">
+        <div class="lg:col-span-7 space-y-6">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-400/30 text-sky-300 text-xs font-medium">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            Zero-Trust Payment Verification Layer • Razorpay Test Mode Active
+          </div>
+          <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+            Tamper-Proof Payment Infrastructure for <span class="text-sky-400">College Event Portals.</span>
+          </h1>
+          <p class="text-slate-300 text-lg max-w-2xl leading-relaxed">
+            Student-built event sites often trust frontend payment callbacks—exposing registrations to replay attacks and spoofed receipts. SecurePay enforces server-side HMAC-SHA256 verification, webhook auditing, and real-time anomaly detection.
+          </p>
+          <div class="flex flex-wrap gap-4 pt-2">
+            <button onclick="quickDemoLogin('student')" class="px-6 py-3.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-navy-950 font-bold text-sm transition shadow-lg shadow-sky-500/25 flex items-center gap-2">
+              Launch Student Portal
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            </button>
+            <button onclick="quickDemoLogin('admin')" class="px-6 py-3.5 rounded-xl bg-navy-800 hover:bg-navy-700 text-white font-semibold text-sm border border-sky-400/30 transition flex items-center gap-2">
+              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+              Admin & Security Console
+            </button>
+          </div>
+          <div class="grid grid-cols-3 gap-4 pt-6 border-t border-navy-700/70 max-w-lg">
+            <div>
+              <div class="text-2xl font-bold text-white">HMAC-256</div>
+              <div class="text-xs text-slate-400">Cryptographic Verification</div>
+            </div>
+            <div>
+              <div class="text-2xl font-bold text-sky-400">PCI-DSS</div>
+              <div class="text-xs text-slate-400">Zero Card/PIN Storage</div>
+            </div>
+            <div>
+              <div class="text-2xl font-bold text-emerald-400">RLS</div>
+              <div class="text-xs text-slate-400">Row-Level Data Isolation</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Security Architecture Preview Card -->
+        <div class="lg:col-span-5">
+          <div class="bg-navy-800/90 border border-sky-500/20 rounded-2xl p-6 shadow-2xl space-y-4">
+            <div class="flex items-center justify-between border-b border-navy-700 pb-3">
+              <span class="text-xs font-mono text-sky-400">PIPELINE // SERVER_VERIFY_FLOW</span>
+              <span class="px-2 py-0.5 text-[11px] rounded bg-emerald-500/20 text-emerald-300 font-mono">SIMULATED ENV</span>
+            </div>
+            <div class="space-y-3 text-sm">
+              <div class="p-3 rounded-xl bg-navy-900/90 border border-navy-700 flex items-start gap-3">
+                <span class="w-6 h-6 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center text-xs font-bold shrink-0">1</span>
+                <div>
+                  <div class="font-semibold text-white">Server-Side Order Creation</div>
+                  <div class="text-xs text-slate-400">Backend fetches event price from DB—client cannot tamper with INR amount.</div>
+                </div>
+              </div>
+              <div class="p-3 rounded-xl bg-navy-900/90 border border-navy-700 flex items-start gap-3">
+                <span class="w-6 h-6 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center text-xs font-bold shrink-0">2</span>
+                <div>
+                  <div class="font-semibold text-white">Hosted Gateway Checkout</div>
+                  <div class="text-xs text-slate-400">UPI PINs, OTPs & card numbers stay strictly inside Razorpay's vault.</div>
+                </div>
+              </div>
+              <div class="p-3 rounded-xl bg-navy-900/90 border border-navy-700 flex items-start gap-3">
+                <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold shrink-0">3</span>
+                <div>
+                  <div class="font-semibold text-white">Signature + Webhook Confirmation</div>
+                  <div class="text-xs text-slate-400">Seat is confirmed ONLY after backend verifies signature & webhook digest.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Core Security Features Grid -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <h2 class="text-2xl sm:text-3xl font-bold text-navy-900">Built to Protect Student Organizers & Treasurers</h2>
+        <p class="text-slate-600 mt-2 text-sm sm:text-base">Every transaction passes through automated integrity checks before a campus event pass is issued.</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+          <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center mb-4 font-bold">01</div>
+          <h3 class="font-bold text-navy-900 text-lg">No Client-Side Trust</h3>
+          <p class="text-slate-600 text-sm mt-2 leading-relaxed">Frontend redirects never mark a registration as paid. Confirmation requires a valid server-verified <code>razorpay_signature</code>.</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+          <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center mb-4 font-bold">02</div>
+          <h3 class="font-bold text-navy-900 text-lg">Duplicate & Replay Guard</h3>
+          <p class="text-slate-600 text-sm mt-2 leading-relaxed">Idempotency keys and unique payment ID constraints block replay submissions and alert administrators immediately.</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-200/80 shadow-sm">
+          <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center mb-4 font-bold">03</div>
+          <h3 class="font-bold text-navy-900 text-lg">Audit-Ready INR Ledger</h3>
+          <p class="text-slate-600 text-sm mt-2 leading-relaxed">Track gross collections, failed attempts, pending webhooks, and refunds in ₹ with one-click CSV financial exports.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================= AUTHENTICATED WORKSPACE (STUDENT / ADMIN) ================= -->
+  <div id="view-workspace" class="hidden min-h-screen flex bg-[#F4F7FB]">
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-navy-950/60 z-30 hidden lg:hidden"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-40 w-64 bg-navy-900 text-white flex flex-col transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out">
+      <div class="h-16 px-6 flex items-center justify-between border-b border-navy-800">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-sky-500 flex items-center justify-center font-bold text-navy-950">S</div>
+          <span class="font-bold text-lg tracking-tight">Secure<span class="text-sky-400">Pay</span></span>
+        </div>
+        <button onclick="toggleMobileSidebar()" class="lg:hidden text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <!-- Active Role Banner -->
+      <div class="px-4 py-4 border-b border-navy-800">
+        <div class="p-3 rounded-xl bg-navy-800/80 border border-navy-700">
+          <div class="flex items-center justify-between">
+            <span id="sidebar-role-badge" class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-sky-500/20 text-sky-300">STUDENT</span>
+            <span class="text-[10px] font-mono text-amber-300">TEST MODE</span>
+          </div>
+          <div id="sidebar-user-name" class="font-semibold text-sm text-white mt-2 truncate">Aarav Sharma</div>
+          <div id="sidebar-user-email" class="text-xs text-slate-400 truncate">aarav.cs24@college.edu.in</div>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav id="sidebar-nav" class="flex-1 px-3 py-4 space-y-1 overflow-y-auto"></nav>
+
+      <!-- Role Switcher (Demo Convenience) & Logout -->
+      <div class="p-4 border-t border-navy-800 space-y-2">
+        <button onclick="switchDemoRole()" class="w-full py-2 px-3 rounded-lg bg-navy-800 hover:bg-navy-700 text-xs font-medium text-sky-300 border border-navy-700 transition text-left flex items-center justify-between">
+          <span>Switch Role View</span>
+          <span>⇄</span>
+        </button>
+        <button onclick="logoutUser()" class="w-full py-2 px-3 rounded-lg text-xs font-medium text-rose-300 hover:bg-rose-500/10 transition text-left flex items-center justify-between">
+          <span>Sign Out</span>
+          <span>→</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col min-w-0">
+      <!-- Top Bar -->
+      <header class="h-16 bg-white border-b border-slate-200 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-20">
+        <div class="flex items-center gap-3">
+          <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+          <div>
+            <h1 id="page-title" class="text-lg font-bold text-navy-900">College Events</h1>
+            <p id="page-subtitle" class="text-xs text-slate-500 hidden sm:block">Verified Razorpay Test-Mode Payment Gateway</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200">
+            <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+            Simulated Sandbox Ledger
+          </span>
+        </div>
+      </header>
+
+      <!-- Dynamic Tab Content -->
+      <main id="workspace-content" class="flex-1 p-4 sm:p-8 max-w-7xl w-full mx-auto space-y-6 fade-in"></main>
+    </div>
+  </div>
+
+  <!-- ================= AUTH MODAL ================= -->
+  <div id="auth-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-navy-950/70 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 fade-in">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 id="auth-modal-title" class="text-xl font-bold text-navy-900">Sign in to SecurePay</h2>
+          <p class="text-xs text-slate-500 mt-1">Role-Based Session Isolation</p>
+        </div>
+        <button onclick="closeAuthModal()" class="text-slate-400 hover:text-slate-700 text-lg">✕</button>
+      </div>
+      <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+        <div id="auth-name-field" class="hidden">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Full Name</label>
+          <input type="text" id="auth-name" placeholder="e.g., Priya Nair" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-sky-500" />
+        </div>
+        <div id="auth-roll-field" class="hidden">
+          <label class="block text-xs font-semibold text-slate-700 mb-1">College Roll Number</label>
+          <input type="text" id="auth-roll" placeholder="e.g., 24CS108" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-sky-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">College Email</label>
+          <input type="email" id="auth-email" required placeholder="student@college.edu.in" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-sky-500" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Password</label>
+          <input type="password" id="auth-password" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-sm focus:outline-none focus:border-sky-500" />
+        </div>
+        <button type="submit" id="auth-submit-btn" class="w-full py-3 rounded-xl bg-navy-900 hover:bg-navy-800 text-white font-semibold text-sm transition">Continue</button>
+      </form>
+      <div class="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+        <button onclick="quickDemoLogin('student')" class="text-sky-600 font-semibold hover:underline">Demo Student Login</button>
+        <button onclick="quickDemoLogin('admin')" class="text-navy-900 font-semibold hover:underline">Demo Admin Login</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= RAZORPAY TEST-MODE CHECKOUT SIMULATOR MODAL ================= -->
+  <div id="checkout-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-navy-950/75 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full overflow-hidden shadow-2xl border border-slate-200 fade-in">
+      <!-- Razorpay-Style Secure Header -->
+      <div class="bg-navy-900 text-white p-5 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-400/40 flex items-center justify-center text-sky-400 font-bold">₹</div>
+          <div>
+            <div class="text-xs text-sky-300 font-mono">RAZORPAY TEST CHECKOUT</div>
+            <div id="chk-event-title" class="font-bold text-base truncate max-w-[230px]">HackSphere 2026</div>
+          </div>
+        </div>
+        <button onclick="closeCheckoutModal()" class="text-slate-400 hover:text-white">✕</button>
+      </div>
+
+      <div class="p-6 space-y-5">
+        <!-- Server Order Metadata -->
+        <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-2 text-xs">
+          <div class="flex justify-between">
+            <span class="text-slate-500">Server Order ID</span>
+            <span id="chk-order-id" class="font-mono font-semibold text-navy-900">order_Sim982341</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Amount Payable (INR)</span>
+            <span id="chk-amount" class="font-bold text-base text-navy-900">₹499.00</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Student Account</span>
+            <span id="chk-student" class="font-medium text-slate-700">aarav.cs24@college.edu.in</span>
+          </div>
+        </div>
+
+        <!-- PCI-DSS Compliance Notice -->
+        <div class="p-3 rounded-xl bg-sky-50 border border-sky-200 text-xs text-sky-900 flex gap-2.5">
+          <span class="text-base">🔒</span>
+          <div>
+            <strong>Zero Sensitive Data Collection:</strong> SecurePay never collects or stores UPI PINs, OTPs, CVVs, or card numbers. Authentication happens exclusively on the payment provider's hosted page.
+          </div>
+        </div>
+
+        <!-- Payment Method Selection (No sensitive inputs) -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-2">Select Hosted Payment Method</label>
+          <div class="grid grid-cols-3 gap-2 text-xs font-medium">
+            <button type="button" onclick="selectPayMethod(this, 'UPI Intent')" class="pay-method-btn border-2 border-sky-500 bg-sky-50 text-navy-900 py-2.5 rounded-xl">UPI / QR</button>
+            <button type="button" onclick="selectPayMethod(this, 'NetBanking')" class="pay-method-btn border border-slate-200 text-slate-600 py-2.5 rounded-xl hover:bg-slate-50">NetBanking</button>
+            <button type="button" onclick="selectPayMethod(this, 'Hosted Card')" class="pay-method-btn border border-slate-200 text-slate-600 py-2.5 rounded-xl hover:bg-slate-50">Card (Hosted)</button>
+          </div>
+        </div>
+
+        <!-- Simulated Gateway Outcome Controls -->
+        <div class="pt-2 border-t border-slate-100 space-y-2.5">
+          <div class="text-[11px] font-semibold uppercase tracking-wider text-slate-400">Simulate Provider & Server Verification Outcome</div>
+          <button id="btn-sim-success" onclick="processSimulatedPayment('SUCCESS')" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition shadow-sm">
+            Simulate Valid Payment + HMAC Signature
+          </button>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="processSimulatedPayment('PENDING')" class="py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 font-semibold text-xs transition">
+              Simulate Pending Webhook
+            </button>
+            <button onclick="processSimulatedPayment('FAILED')" class="py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-semibold text-xs transition">
+              Simulate Bank Decline
+            </button>
+          </div>
+          <button onclick="processSimulatedPayment('TAMPERED')" class="w-full py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-rose-300 font-mono text-xs transition">
+            Test Security Alert: Send Forged Signature
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= RECEIPT MODAL ================= -->
+  <div id="receipt-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-navy-950/75 backdrop-blur-sm p-4">
+    <div id="receipt-printable" class="bg-white rounded-2xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-5 fade-in">
+      <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+        <div>
+          <div class="text-xs font-mono text-sky-600 font-bold">SECUREPAY VERIFIED RECEIPT</div>
+          <h3 class="text-lg font-bold text-navy-900 mt-0.5">Official Event Pass & Invoice</h3>
+        </div>
+        <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">VERIFIED</span>
+      </div>
+      <div id="receipt-body" class="space-y-3 text-sm"></div>
+      <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] font-mono text-slate-600 break-all" id="receipt-hash"></div>
+      <div class="flex gap-3 pt-2">
+        <button onclick="downloadReceiptText()" class="flex-1 py-2.5 rounded-xl bg-navy-900 hover:bg-navy-800 text-white font-semibold text-xs transition">Download Receipt (.txt)</button>
+        <button onclick="closeReceiptModal()" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-50">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // SECUREPAY APPLICATION STATE (SIMULATED BACKEND LEDGER)
+    // =========================================================================
+    const state = {
+      currentUser: null,
+      activeTab: 'events',
+      selectedMethod: 'UPI Intent',
+      activeCheckoutOrder: null,
+      activeReceipt: null,
+      failedLoginAttempts: 0,
+      events: [
+        { id: 'EVT-101', title: 'HackSphere 2026 — 36-Hr National Hackathon', category: 'Technical', date: '2026-12-05', venue: 'Main Auditorium', fee: 499, seatsTotal: 200, seatsFilled: 142 },
+        { id: 'EVT-102', title: 'RoboWars & Autonomous Drone Grand Prix', category: 'Robotics', date: '2026-12-08', venue: 'Open Air Arena', fee: 750, seatsTotal: 80, seatsFilled: 64 },
+        { id: 'EVT-103', title: 'FinTech & Quantitative Trading Summit', category: 'Workshop', date: '2026-12-12', venue: 'Seminar Hall B', fee: 299, seatsTotal: 150, seatsFilled: 118 },
+        { id: 'EVT-104', title: 'Rhythm & Resonance Cultural Night', category: 'Cultural', date: '2026-12-15', venue: 'College Stadium', fee: 350, seatsTotal: 500, seatsFilled: 389 }
+      ],
+      transactions: [
+        {
+          txnId: 'TXN_SP_891042',
+          orderId: 'order_RzpTest901',
+          razorpayPaymentId: 'pay_Sim882104A',
+          studentName: 'Aarav Sharma',
+          studentEmail: 'aarav.cs24@college.edu.in',
+          rollNo: '24CS102',
+          eventId: 'EVT-103',
+          eventTitle: 'FinTech & Quantitative Trading Summit',
+          amount: 299,
+          method: 'UPI Intent',
+          status: 'SUCCESS',
+          verifiedByServer: true,
+          webhookVerified: true,
+          refundStatus: 'NONE',
+          signatureHash: 'hmac_sha256_9f84c2a109e77b31d84e9021c44b',
+          createdAt: '2026-11-12 14:22:10'
+        },
+        {
+          txnId: 'TXN_SP_891043',
+          orderId: 'order_RzpTest902',
+          razorpayPaymentId: 'pay_Sim882199B',
+          studentName: 'Diya Menon',
+          studentEmail: 'diya.ec23@college.edu.in',
+          rollNo: '23EC045',
+          eventId: 'EVT-101',
+          eventTitle: 'HackSphere 2026 — 36-Hr National Hackathon',
+          amount: 499,
+          method: 'NetBanking',
+          status: 'SUCCESS',
+          verifiedByServer: true,
+          webhookVerified: true,
+          refundStatus: 'NONE',
+          signatureHash: 'hmac_sha256_4b12e88a301f9c22a71d3309f11a',
+          createdAt: '2026-11-12 16:05:44'
+        },
+        {
+          txnId: 'TXN_SP_891044',
+          orderId: 'order_RzpTest903',
+          razorpayPaymentId: 'pay_Sim882240C',
+          studentName: 'Rohan Verma',
+          studentEmail: 'rohan.me24@college.edu.in',
+          rollNo: '24ME088',
+          eventId: 'EVT-102',
+          eventTitle: 'RoboWars & Autonomous Drone Grand Prix',
+          amount: 750,
+          method: 'UPI Intent',
+          status: 'FAILED',
+          verifiedByServer: false,
+          webhookVerified: true,
+          refundStatus: 'NONE',
+          signatureHash: 'ERR_BANK_DECLINE_INSUFFICIENT_FUNDS',
+          createdAt: '2026-11-12 18:40:12'
+        },
+        {
+          txnId: 'TXN_SP_891045',
+          orderId: 'order_RzpTest904',
+          razorpayPaymentId: 'pay_Sim882311D',
+          studentName: 'Sneha Kulkarni',
+          studentEmail: 'sneha.it25@college.edu.in',
+          rollNo: '25IT019',
+          eventId: 'EVT-104',
+          eventTitle: 'Rhythm & Resonance Cultural Night',
+          amount: 350,
+          method: 'Hosted Card',
+          status: 'PENDING',
+          verifiedByServer: false,
+          webhookVerified: false,
+          refundStatus: 'NONE',
+          signatureHash: 'AWAITING_WEBHOOK_PAYMENT_CAPTURED',
+          createdAt: '2026-11-13 01:12:05'
+        }
+      ],
+      securityLogs: [
+        {
+          id: 'SEC-501',
+          severity: 'HIGH',
+          type: 'INVALID_SIGNATURE_ATTEMPT',
+          message: 'Rejected payment verification for order_RzpTest889: HMAC-SHA256 digest mismatch.',
+          actor: 'ip:103.48.19.22',
+          timestamp: '2026-11-12 19:14:03'
+        },
+        {
+          id: 'SEC-502',
+          severity: 'MEDIUM',
+          type: 'DUPLICATE_TXN_BLOCKED',
+          message: 'Replay attempt blocked for razorpay_payment_id pay_Sim882104A (Idempotency lock active).',
+          actor: 'aarav.cs24@college.edu.in',
+          timestamp: '2026-11-12 14:23:01'
+        },
+        {
+          id: 'SEC-503',
+          severity: 'LOW',
+          type: 'WEBHOOK_VERIFIED',
+          message: 'Razorpay webhook event payment.captured verified via X-Razorpay-Signature.',
+          actor: 'razorpay-webhook-worker',
+          timestamp: '2026-11-12 16:05:45'
+        },
+        {
+          id: 'SEC-504',
+          severity: 'HIGH',
+          type: 'UNAUTHORIZED_ADMIN_PROBE',
+          message: '3 consecutive failed login attempts against admin portal from external subnet.',
+          actor: 'ip:185.220.101.4',
+          timestamp: '2026-11-13 00:48:19'
+        }
+      ]
+    };
+
+    // =========================================================================
+    // TOAST & UI HELPERS
+    // =========================================================================
+    function showToast(title, message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const colors = {
+        success: 'border-emerald-500 bg-white text-slate-900',
+        error: 'border-rose-500 bg-white text-slate-900',
+        warning: 'border-amber-500 bg-white text-slate-900',
+        info: 'border-sky-500 bg-white text-slate-900'
+      };
+      const badgeColors = {
+        success: 'bg-emerald-100 text-emerald-700',
+        error: 'bg-rose-100 text-rose-700',
+        warning: 'bg-amber-100 text-amber-800',
+        info: 'bg-sky-100 text-sky-700'
+      };
+      const el = document.createElement('div');
+      el.className = `pointer-events-auto p-4 rounded-xl border-l-4 shadow-xl border border-slate-200 ${colors[type]} fade-in`;
+      el.innerHTML = `
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <span class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded ${badgeColors[type]}">${type}</span>
+            <div class="font-bold text-sm mt-1">${title}</div>
+            <div class="text-xs text-slate-600 mt-0.5">${message}</div>
+          </div>
+          <button onclick="this.parentElement.parentElement.remove()" class="text-slate-400 hover:text-slate-700 text-xs">✕</button>
+        </div>
+      `;
+      container.appendChild(el);
+      setTimeout(() => { if (el.parentElement) el.remove(); }, 5000);
+    }
+
+    function formatINR(amount) {
+      return '₹' + Number(amount).toLocaleString('en-IN');
+    }
+
+    // =========================================================================
+    // AUTHENTICATION & ROLE MANAGEMENT
+    // =========================================================================
+    let authMode = 'login';
+
+    function openAuthModal(mode = 'login') {
+      authMode = mode;
+      document.getElementById('auth-modal').classList.remove('hidden');
+      document.getElementById('auth-modal').classList.add('flex');
+      document.getElementById('auth-modal-title').textContent = mode === 'login' ? 'Sign in to SecurePay' : 'Create Student Account';
+      document.getElementById('auth-name-field').classList.toggle('hidden', mode === 'login');
+      document.getElementById('auth-roll-field').classList.toggle('hidden', mode === 'login');
+    }
+
+    function closeAuthModal() {
+      document.getElementById('auth-modal').classList.add('hidden');
+      document.getElementById('auth-modal').classList.remove('flex');
+    }
+
+    function handleAuthSubmit(e) {
+      e.preventDefault();
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+      const name = document.getElementById('auth-name').value.trim() || email.split('@')[0];
+      const roll = document.getElementById('auth-roll').value.trim() || '24CS110';
+
+      if (password.length < 4) {
+        state.failedLoginAttempts++;
+        state.securityLogs.unshift({
+          id: 'SEC-' + Math.floor(505 + Math.random() * 400),
+          severity: 'MEDIUM',
+          type: 'UNAUTHORIZED_LOGIN_ALERT',
+          message: `Failed authentication attempt for ${email} (invalid credentials).`,
+          actor: email,
+          timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19)
+        });
+        showToast('Authentication Rejected', 'Invalid credentials logged in Security Monitor.', 'error');
+        return;
+      }
+
+      const role = email.toLowerCase().includes('admin') ? 'admin' : 'student';
+      state.currentUser = { name, email, rollNo: roll, role };
+      closeAuthModal();
+      enterWorkspace();
+      showToast('Authenticated Session', `Welcome back, ${name} (${role.toUpperCase()}).`, 'success');
+    }
+
+    function quickDemoLogin(role) {
+      if (role === 'admin') {
+        state.currentUser = {
+          name: 'Dr. Kavita Iyer (Dean Finance)',
+          email: 'admin.finance@college.edu.in',
+          rollNo: 'ADMIN-01',
+          role: 'admin'
+        };
+      } else {
+        state.currentUser = {
+          name: 'Aarav Sharma',
+          email: 'aarav.cs24@college.edu.in',
+          rollNo: '24CS102',
+          role: 'student'
+        };
+      }
+      closeAuthModal();
+      enterWorkspace();
+      showToast('Demo Session Active', `Signed in as ${state.currentUser.name}`, 'info');
+    }
+
+    function switchDemoRole() {
+      if (!state.currentUser) return;
+      quickDemoLogin(state.currentUser.role === 'student' ? 'admin' : 'student');
+    }
+
+    function logoutUser() {
+      state.currentUser = null;
+      document.getElementById('view-workspace').classList.add('hidden');
+      document.getElementById('view-landing').classList.remove('hidden');
+      showToast('Signed Out', 'Session token revoked.', 'info');
+    }
+
+    function enterWorkspace() {
+      document.getElementById('view-landing').classList.add('hidden');
+      document.getElementById('view-workspace').classList.remove('hidden');
+      document.getElementById('sidebar-role-badge').textContent = state.currentUser.role.toUpperCase();
+      document.getElementById('sidebar-user-name').textContent = state.currentUser.name;
+      document.getElementById('sidebar-user-email').textContent = state.currentUser.email;
+
+      state.activeTab = state.currentUser.role === 'admin' ? 'admin-overview' : 'events';
+      renderSidebarNav();
+      renderWorkspaceContent();
+    }
+
+    function toggleMobileSidebar() {
+      const sb = document.getElementById('sidebar');
+      const bd = document.getElementById('sidebar-backdrop');
+      sb.classList.toggle('-translate-x-full');
+      bd.classList.toggle('hidden');
+    }
+
+    function renderSidebarNav() {
+      const nav = document.getElementById('sidebar-nav');
+      const isAdmin = state.currentUser.role === 'admin';
+      const items = isAdmin
+        ? [
+            { id: 'admin-overview', label: 'Admin Dashboard', icon: '📊' },
+            { id: 'admin-transactions', label: 'Transactions & Refunds', icon: '💳' },
+            { id: 'admin-security', label: 'Security Monitoring', icon: '🛡️' }
+          ]
+        : [
+            { id: 'events', label: 'Browse College Events', icon: '🎓' },
+            { id: 'my-transactions', label: 'My Payments & Receipts', icon: '🧾' }
+          ];
+
+      nav.innerHTML = items.map(item => `
+        <button onclick="selectTab('${item.id}')" class="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition ${
+          state.activeTab === item.id
+            ? 'bg-sky-500 text-navy-950 font-bold shadow-md shadow-sky-500/20'
+            : 'text-slate-300 hover:bg-navy-800 hover:text-white'
+        }">
+          <span>${item.icon}</span>
+          <span>${item.label}</span>
+        </button>
+      `).join('');
+    }
+
+    function selectTab(tabId) {
+      state.activeTab = tabId;
+      renderSidebarNav();
+      renderWorkspaceContent();
+      if (window.innerWidth < 1024) toggleMobileSidebar();
+    }
+
+    // =========================================================================
+    // WORKSPACE VIEWS RENDERER
+    // =========================================================================
+    function renderWorkspaceContent() {
+      const container = document.getElementById('workspace-content');
+      const titleEl = document.getElementById('page-title');
+      const subEl = document.getElementById('page-subtitle');
+
+      if (state.activeTab === 'events') {
+        titleEl.textContent = 'College Events Portal';
+        subEl.textContent = 'Register securely — seats confirm only after backend payment verification';
+        renderStudentEvents(container);
+      } else if (state.activeTab === 'my-transactions') {
+        titleEl.textContent = 'My Transactions & Verified Receipts';
+        subEl.textContent = 'Real-time payment status tracked from server-side ledger';
+        renderStudentTransactions(container);
+      } else if (state.activeTab === 'admin-overview') {
+        titleEl.textContent = 'Admin Financial & Registration Overview';
+        subEl.textContent = 'Real-time INR reconciliation and gateway health metrics';
+        renderAdminOverview(container);
+      } else if (state.activeTab === 'admin-transactions') {
+        titleEl.textContent = 'Transaction Management & Refund Ledger';
+        subEl.textContent = 'Inspect server verification signatures, reconcile pending webhooks, and issue refunds';
+        renderAdminTransactions(container);
+      } else if (state.activeTab === 'admin-security') {
+        titleEl.textContent = 'Security Operations & Anomaly Monitor';
+        subEl.textContent = 'HMAC signature failures, duplicate replay blocks, and webhook audit logs';
+        renderSecurityMonitor(container);
+      }
+    }
+
+    // 1. STUDENT: BROWSE EVENTS
+    function renderStudentEvents(container) {
+      const userEmail = state.currentUser.email;
+      container.innerHTML = `
+        <div class="grid md:grid-cols-2 gap-6">
+          ${state.events.map(ev => {
+            const existingTxn = state.transactions.find(t => t.eventId === ev.id && t.studentEmail === userEmail && t.status === 'SUCCESS');
+            const pendingTxn = state.transactions.find(t => t.eventId === ev.id && t.studentEmail === userEmail && t.status === 'PENDING');
+            const seatsLeft = ev.seatsTotal - ev.seatsFilled;
+
+            return `
+              <div class="bg-white rounded-2xl border border-slate-200/90 p-6 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between gap-2 mb-3">
+                    <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200">${ev.category}</span>
+                    <span class="text-xs font-mono text-slate-500">${ev.id}</span>
+                  </div>
+                  <h3 class="text-lg font-bold text-navy-900">${ev.title}</h3>
+                  <div class="mt-3 space-y-1.5 text-xs text-slate-600">
+                    <div>📅 <strong>Date:</strong> ${ev.date}</div>
+                    <div>📍 <strong>Venue:</strong> ${ev.venue}</div>
+                    <div>🎟️ <strong>Availability:</strong> ${seatsLeft} of ${ev.seatsTotal} seats remaining</div>
+                  </div>
+                </div>
+                <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
+                  <div>
+                    <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Registration Fee</div>
+                    <div class="text-2xl font-extrabold text-navy-900">${formatINR(ev.fee)}</div>
+                  </div>
+                  ${
+                    existingTxn
+                      ? `<button onclick="openReceipt('${existingTxn.txnId}')" class="px-4 py-2.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold text-xs hover:bg-emerald-100 transition">✓ Registered • View Receipt</button>`
+                      : pendingTxn
+                      ? `<button onclick="selectTab('my-transactions')" class="px-4 py-2.5 rounded-xl bg-amber-50 text-amber-800 border border-amber-200 font-semibold text-xs">⏳ Webhook Pending</button>`
+                      : `<button onclick="initiateCheckout('${ev.id}')" class="px-5 py-2.5 rounded-xl bg-navy-900 hover:bg-sky-600 text-white font-semibold text-xs transition shadow-sm">Register & Pay ${formatINR(ev.fee)}</button>`
+                  }
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    // 2. STUDENT: MY TRANSACTIONS & RECEIPTS
+    function renderStudentTransactions(container) {
+      const myTxns = state.transactions.filter(t => t.studentEmail === state.currentUser.email);
+      if (myTxns.length === 0) {
+        container.innerHTML = `<div class="bg-white rounded-2xl p-12 text-center border border-slate-200 text-slate-500">No payment attempts recorded yet. Browse events to register.</div>`;
+        return;
+      }
+      container.innerHTML = `
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  <th class="py-3.5 px-4">Transaction ID</th>
+                  <th class="py-3.5 px-4">Event</th>
+                  <th class="py-3.5 px-4">Amount</th>
+                  <th class="py-3.5 px-4">Server Verification</th>
+                  <th class="py-3.5 px-4">Status</th>
+                  <th class="py-3.5 px-4 text-right">Receipt</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-sm">
+                ${myTxns.map(t => `
+                  <tr class="hover:bg-slate-50/80">
+                    <td class="py-3.5 px-4 font-mono text-xs font-semibold text-navy-900">${t.txnId}<div class="text-[11px] text-slate-400">${t.orderId}</div></td>
+                    <td class="py-3.5 px-4 font-medium text-slate-800">${t.eventTitle}<div class="text-xs text-slate-400">${t.createdAt}</div></td>
+                    <td class="py-3.5 px-4 font-bold text-navy-900">${formatINR(t.amount)}</td>
+                    <td class="py-3.5 px-4 text-xs">
+                      ${t.verifiedByServer
+                        ? '<span class="text-emerald-700 font-semibold">✓ HMAC Verified</span>'
+                        : '<span class="text-slate-400">Unverified</span>'}
+                    </td>
+                    <td class="py-3.5 px-4">${renderStatusBadge(t.status)}</td>
+                    <td class="py-3.5 px-4 text-right">
+                      ${t.status === 'SUCCESS'
+                        ? `<button onclick="openReceipt('${t.txnId}')" class="px-3 py-1.5 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-700 font-semibold text-xs border border-sky-200">Download Receipt</button>`
+                        : `<span class="text-xs text-slate-400">Unavailable</span>`}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    // 3. ADMIN: DASHBOARD OVERVIEW & CHARTS
+    let revenueChartInstance = null;
+    let statusChartInstance = null;
+
+    function renderAdminOverview(container) {
+      const successful = state.transactions.filter(t => t.status === 'SUCCESS');
+      const failed = state.transactions.filter(t => t.status === 'FAILED');
+      const pending = state.transactions.filter(t => t.status === 'PENDING');
+      const totalINR = successful.reduce((sum, t) => sum + (t.refundStatus === 'REFUNDED' ? 0 : t.amount), 0);
+
+      container.innerHTML = `
+        <!-- KPI Summary Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div class="bg-navy-900 text-white p-5 rounded-2xl shadow-sm">
+            <div class="text-xs text-sky-300 font-semibold uppercase">Net Collection</div>
+            <div class="text-2xl font-extrabold mt-1">${formatINR(totalINR)}</div>
+            <div class="text-[11px] text-slate-400 mt-1">Verified & settled in INR</div>
+          </div>
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="text-xs text-slate-500 font-semibold uppercase">Total Registrations</div>
+            <div class="text-2xl font-extrabold text-navy-900 mt-1">${successful.length}</div>
+            <div class="text-[11px] text-emerald-600 mt-1">100% HMAC-verified seats</div>
+          </div>
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="text-xs text-slate-500 font-semibold uppercase">Successful Txns</div>
+            <div class="text-2xl font-extrabold text-emerald-600 mt-1">${successful.length}</div>
+            <div class="text-[11px] text-slate-400 mt-1">Webhook confirmed</div>
+          </div>
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="text-xs text-slate-500 font-semibold uppercase">Pending Webhooks</div>
+            <div class="text-2xl font-extrabold text-amber-600 mt-1">${pending.length}</div>
+            <div class="text-[11px] text-slate-400 mt-1">Awaiting provider callback</div>
+          </div>
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="text-xs text-slate-500 font-semibold uppercase">Failed / Blocked</div>
+            <div class="text-2xl font-extrabold text-rose-600 mt-1">${failed.length}</div>
+            <div class="text-[11px] text-slate-400 mt-1">Zero seats issued</div>
+          </div>
+        </div>
+
+        <!-- Interactive Charts -->
+        <div class="grid lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h3 class="font-bold text-navy-900">Event-Wise Collection (INR)</h3>
+                <p class="text-xs text-slate-500">Verified revenue breakdown across campus events</p>
+              </div>
+              <button onclick="exportCSVReport()" class="px-3.5 py-2 rounded-xl bg-navy-900 hover:bg-navy-800 text-white text-xs font-semibold transition">Export CSV Report</button>
+            </div>
+            <div class="h-64"><canvas id="chart-revenue"></canvas></div>
+          </div>
+          <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-navy-900">Transaction Integrity Split</h3>
+            <p class="text-xs text-slate-500 mb-4">Status distribution across all attempts</p>
+            <div class="h-64 flex items-center justify-center"><canvas id="chart-status"></canvas></div>
+          </div>
+        </div>
+      `;
+
+      setTimeout(() => {
+        const ctxRev = document.getElementById('chart-revenue');
+        const ctxStat = document.getElementById('chart-status');
+        if (revenueChartInstance) revenueChartInstance.destroy();
+        if (statusChartInstance) statusChartInstance.destroy();
+
+        const eventLabels = state.events.map(e => e.title.split('—')[0].trim());
+        const eventTotals = state.events.map(e =>
+          state.transactions
+            .filter(t => t.eventId === e.id && t.status === 'SUCCESS' && t.refundStatus !== 'REFUNDED')
+            .reduce((s, t) => s + t.amount, 0)
+        );
+
+        revenueChartInstance = new Chart(ctxRev, {
+          type: 'bar',
+          data: {
+            labels: eventLabels,
+            datasets: [{
+              label: 'Verified Collection (₹)',
+              data: eventTotals,
+              backgroundColor: '#0284C7',
+              borderRadius: 8
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+          }
+        });
+
+        statusChartInstance = new Chart(ctxStat, {
+          type: 'doughnut',
+          data: {
+            labels: ['Success', 'Pending', 'Failed'],
+            datasets: [{
+              data: [successful.length, pending.length, failed.length],
+              backgroundColor: ['#10B981', '#F59E0B', '#EF4444'],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '68%'
+          }
+        });
+      }, 30);
+    }
+
+    // 4. ADMIN: TRANSACTION MANAGEMENT & REFUNDS
+    function renderAdminTransactions(container) {
+      container.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200">
+          <div class="text-xs text-slate-600">Showing <strong>${state.transactions.length}</strong> gateway records • All amounts in INR (₹)</div>
+          <button onclick="exportCSVReport()" class="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-semibold transition">⬇ Download Audit CSV</button>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                  <th class="py-3.5 px-4">Txn / Order ID</th>
+                  <th class="py-3.5 px-4">Student</th>
+                  <th class="py-3.5 px-4">Event</th>
+                  <th class="py-3.5 px-4">Amount</th>
+                  <th class="py-3.5 px-4">Status</th>
+                  <th class="py-3.5 px-4">Refund</th>
+                  <th class="py-3.5 px-4 text-right">Admin Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-sm">
+                ${state.transactions.map(t => `
+                  <tr class="hover:bg-slate-50/70">
+                    <td class="py-3.5 px-4 font-mono text-xs">
+                      <div class="font-bold text-navy-900">${t.txnId}</div>
+                      <div class="text-slate-400">${t.razorpayPaymentId}</div>
+                    </td>
+                    <td class="py-3.5 px-4">
+                      <div class="font-semibold text-slate-800">${t.studentName}</div>
+                      <div class="text-xs text-slate-400">${t.rollNo} • ${t.studentEmail}</div>
+                    </td>
+                    <td class="py-3.5 px-4 text-xs font-medium text-slate-700">${t.eventTitle}</td>
+                    <td class="py-3.5 px-4 font-bold text-navy-900">${formatINR(t.amount)}</td>
+                    <td class="py-3.5 px-4">${renderStatusBadge(t.status)}</td>
+                    <td class="py-3.5 px-4 text-xs">
+                      ${t.refundStatus === 'REFUNDED'
+                        ? '<span class="px-2 py-0.5 rounded bg-purple-100 text-purple-800 font-semibold">REFUNDED</span>'
+                        : '<span class="text-slate-400">—</span>'}
+                    </td>
+                    <td class="py-3.5 px-4 text-right space-x-1.5">
+                      ${t.status === 'PENDING'
+                        ? `<button onclick="reconcilePending('${t.txnId}')" class="px-2.5 py-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-semibold">Verify Webhook</button>`
+                        : ''}
+                      ${t.status === 'SUCCESS' && t.refundStatus !== 'REFUNDED'
+                        ? `<button onclick="issueRefund('${t.txnId}')" class="px-2.5 py-1 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold">Issue Refund</button>`
+                        : ''}
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    // 5. SECURITY MONITORING MODULE
+    function renderSecurityMonitor(container) {
+      const highCount = state.securityLogs.filter(l => l.severity === 'HIGH').length;
+      container.innerHTML = `
+        <div class="grid sm:grid-cols-3 gap-4">
+          <div class="bg-white p-5 rounded-2xl border border-rose-200 shadow-sm">
+            <div class="text-xs font-bold uppercase text-rose-600">Critical / High Alerts</div>
+            <div class="text-3xl font-extrabold text-navy-900 mt-1">${highCount}</div>
+            <div class="text-xs text-slate-500 mt-1">Forged signatures & brute-force blocks</div>
+          </div>
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="text-xs font-bold uppercase text-sky-600">Duplicate Replay Guard</div>
+            <div class="text-3xl font-extrabold text-navy-900 mt-1">ACTIVE</div>
+            <div class="text-xs text-slate-500 mt-1">Unique razorpay_payment_id constraint</div>
+          </div>
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="text-xs font-bold uppercase text-emerald-600">Webhook Signature Check</div>
+            <div class="text-3xl font-extrabold text-navy-900 mt-1">ENFORCED</div>
+            <div class="text-xs text-slate-500 mt-1">X-Razorpay-Signature HMAC-SHA256</div>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+          <div class="p-4 border-b border-slate-200 flex items-center justify-between">
+            <h3 class="font-bold text-navy-900 text-sm">Real-Time Security & Webhook Audit Stream</h3>
+            <span class="text-xs font-mono text-slate-400">table: security_logs</span>
+          </div>
+          <div class="divide-y divide-slate-100">
+            ${state.securityLogs.map(log => {
+              const badge = log.severity === 'HIGH'
+                ? 'bg-rose-100 text-rose-800 border-rose-200'
+                : log.severity === 'MEDIUM'
+                ? 'bg-amber-100 text-amber-800 border-amber-200'
+                : 'bg-emerald-100 text-emerald-800 border-emerald-200';
+              return `
+                <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50">
+                  <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                      <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badge}">${log.severity}</span>
+                      <span class="font-mono text-xs font-bold text-navy-900">${log.type}</span>
+                      <span class="text-xs text-slate-400">• ${log.id}</span>
+                    </div>
+                    <p class="text-sm text-slate-700">${log.message}</p>
+                  </div>
+                  <div class="text-xs font-mono text-slate-500 sm:text-right shrink-0">
+                    <div>${log.actor}</div>
+                    <div class="text-slate-400">${log.timestamp}</div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderStatusBadge(status) {
+      if (status === 'SUCCESS') return '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">SUCCESS</span>';
+      if (status === 'PENDING') return '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">PENDING</span>';
+      return '<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800">FAILED</span>';
+    }
+
+    // =========================================================================
+    // PAYMENT CHECKOUT & SERVER VERIFICATION SIMULATION
+    // =========================================================================
+    function initiateCheckout(eventId) {
+      const ev = state.events.find(e => e.id === eventId);
+      if (!ev) return;
+
+      const orderId = 'order_Rzp' + Math.floor(100000 + Math.random() * 900000);
+      state.activeCheckoutOrder = {
+        orderId,
+        event: ev,
+        student: state.currentUser
+      };
+
+      document.getElementById('chk-event-title').textContent = ev.title;
+      document.getElementById('chk-order-id').textContent = orderId;
+      document.getElementById('chk-amount').textContent = formatINR(ev.fee) + '.00';
+      document.getElementById('chk-student').textContent = state.currentUser.email;
+
+      document.getElementById('checkout-modal').classList.remove('hidden');
+      document.getElementById('checkout-modal').classList.add('flex');
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkout-modal').classList.add('hidden');
+      document.getElementById('checkout-modal').classList.remove('flex');
+    }
+
+    function selectPayMethod(btn, method) {
+      state.selectedMethod = method;
+      document.querySelectorAll('.pay-method-btn').forEach(b => {
+        b.className = 'pay-method-btn border border-slate-200 text-slate-600 py-2.5 rounded-xl hover:bg-slate-50';
+      });
+      btn.className = 'pay-method-btn border-2 border-sky-500 bg-sky-50 text-navy-900 py-2.5 rounded-xl';
+    }
+
+    function processSimulatedPayment(outcome) {
+      const ctx = state.activeCheckoutOrder;
+      if (!ctx) return;
+
+      const now = new Date().toISOString().replace('T', ' ').slice(0, 19);
+      const txnId = 'TXN_SP_' + Math.floor(100000 + Math.random() * 900000);
+      const payId = 'pay_Sim' + Math.floor(100000 + Math.random() * 900000);
+
+      if (outcome === 'TAMPERED') {
+        state.securityLogs.unshift({
+          id: 'SEC-' + Math.floor(600 + Math.random() * 399),
+          severity: 'HIGH',
+          type: 'INVALID_PAYMENT_VERIFICATION',
+          message: `Forged HMAC signature rejected for ${ctx.orderId} (${ctx.event.title}) by ${ctx.student.email}. Seat NOT granted.`,
+          actor: ctx.student.email,
+          timestamp: now
+        });
+        closeCheckoutModal();
+        showToast('Security Alert Triggered!', 'Backend rejected invalid HMAC signature. Registration blocked and logged.', 'error');
+        return;
+      }
+
+      const duplicate = state.transactions.find(
+        t => t.eventId === ctx.event.id && t.studentEmail === ctx.student.email && t.status === 'SUCCESS'
+      );
+      if (duplicate) {
+        state.securityLogs.unshift({
+          id: 'SEC-' + Math.floor(600 + Math.random() * 399),
+          severity: 'MEDIUM',
+          type: 'DUPLICATE_TRANSACTION_PREVENTED',
+          message: `Duplicate registration attempt blocked for ${ctx.student.email} on ${ctx.event.id}.`,
+          actor: ctx.student.email,
+          timestamp: now
+        });
+        closeCheckoutModal();
+        showToast('Duplicate Blocked', 'You already hold a verified registration for this event.', 'warning');
+        return;
+      }
+
+      const isSuccess = outcome === 'SUCCESS';
+      const isPending = outcome === 'PENDING';
+
+      const newTxn = {
+        txnId,
+        orderId: ctx.orderId,
+        razorpayPaymentId: payId,
+        studentName: ctx.student.name,
+        studentEmail: ctx.student.email,
+        rollNo: ctx.student.rollNo,
+        eventId: ctx.event.id,
+        eventTitle: ctx.event.title,
+        amount: ctx.event.fee,
+        method: state.selectedMethod,
+        status: outcome,
+        verifiedByServer: isSuccess,
+        webhookVerified: isSuccess,
+        refundStatus: 'NONE',
+        signatureHash: isSuccess
+          ? 'hmac_sha256_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+          : isPending
+          ? 'AWAITING_RAZORPAY_WEBHOOK'
+          : 'PROVIDER_DECLINED_TXN',
+        createdAt: now
+      };
+
+      state.transactions.unshift(newTxn);
+
+      if (isSuccess) {
+        ctx.event.seatsFilled += 1;
+        state.securityLogs.unshift({
+          id: 'SEC-' + Math.floor(600 + Math.random() * 399),
+          severity: 'LOW',
+          type: 'PAYMENT_SIGNATURE_VERIFIED',
+          message: `Server verified ${txnId} (${formatINR(ctx.event.fee)}) via HMAC-SHA256.`,
+          actor: 'backend-verifier',
+          timestamp: now
+        });
+        closeCheckoutModal();
+        renderWorkspaceContent();
+        showToast('Payment Verified & Seat Confirmed', `Receipt ${txnId} generated after backend signature check.`, 'success');
+      } else if (isPending) {
+        closeCheckoutModal();
+        renderWorkspaceContent();
+        showToast('Payment Pending Webhook', 'Registration will confirm automatically once Razorpay webhook arrives.', 'warning');
+      } else {
+        closeCheckoutModal();
+        renderWorkspaceContent();
+        showToast('Payment Failed', 'Provider declined transaction. No seat was reserved.', 'error');
+      }
+    }
+
+    // =========================================================================
+    // ADMIN ACTIONS: RECONCILE, REFUND, CSV EXPORT & RECEIPT DOWNLOAD
+    // =========================================================================
+    function reconcilePending(txnId) {
+      const txn = state.transactions.find(t => t.txnId === txnId);
+      if (!txn) return;
+      txn.status = 'SUCCESS';
+      txn.verifiedByServer = true;
+      txn.webhookVerified = true;
+      txn.signatureHash = 'hmac_sha256_webhook_' + Math.random().toString(36).substring(2, 16);
+      const ev = state.events.find(e => e.id === txn.eventId);
+      if (ev) ev.seatsFilled += 1;
+
+      state.securityLogs.unshift({
+        id: 'SEC-' + Math.floor(600 + Math.random() * 399),
+        severity: 'LOW',
+        type: 'WEBHOOK_RECONCILED',
+        message: `Pending transaction ${txnId} confirmed via verified payment.captured webhook.`,
+        actor: state.currentUser.email,
+        timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19)
+      });
+      renderWorkspaceContent();
+      showToast('Webhook Verified', `${txnId} transitioned from PENDING to SUCCESS.`, 'success');
+    }
+
+    function issueRefund(txnId) {
+      const txn = state.transactions.find(t => t.txnId === txnId);
+      if (!txn) return;
+      txn.refundStatus = 'REFUNDED';
+      state.securityLogs.unshift({
+        id: 'SEC-' + Math.floor(600 + Math.random() * 399),
+        severity: 'MEDIUM',
+        type: 'ADMIN_REFUND_ISSUED',
+        message: `Full refund of ${formatINR(txn.amount)} initiated for ${txnId} by ${state.currentUser.email}.`,
+        actor: state.currentUser.email,
+        timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19)
+      });
+      renderWorkspaceContent();
+      showToast('Refund Recorded', `${formatINR(txn.amount)} marked as REFUNDED for ${txn.studentName}.`, 'info');
+    }
+
+    function openReceipt(txnId) {
+      const txn = state.transactions.find(t => t.txnId === txnId);
+      if (!txn) return;
+      state.activeReceipt = txn;
+      document.getElementById('receipt-body').innerHTML = `
+        <div class="flex justify-between"><span class="text-slate-500">Transaction ID</span><span class="font-mono font-bold text-navy-900">${txn.txnId}</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">Gateway Payment ID</span><span class="font-mono text-xs text-slate-700">${txn.razorpayPaymentId}</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">Student Name</span><span class="font-semibold text-navy-900">${txn.studentName} (${txn.rollNo})</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">Event</span><span class="font-semibold text-right max-w-[210px] text-navy-900">${txn.eventTitle}</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">Payment Method</span><span>${txn.method}</span></div>
+        <div class="flex justify-between"><span class="text-slate-500">Timestamp</span><span>${txn.createdAt}</span></div>
+        <div class="flex justify-between pt-2 border-t border-slate-200"><span class="font-bold text-slate-700">Amount Paid (INR)</span><span class="text-lg font-extrabold text-emerald-700">${formatINR(txn.amount)}.00</span></div>
+      `;
+      document.getElementById('receipt-hash').textContent = 'HMAC-SHA256 Proof: ' + txn.signatureHash;
+      document.getElementById('receipt-modal').classList.remove('hidden');
+      document.getElementById('receipt-modal').classList.add('flex');
+    }
+
+    function closeReceiptModal() {
+      document.getElementById('receipt-modal').classList.add('hidden');
+      document.getElementById('receipt-modal').classList.remove('flex');
+    }
+
+    function downloadReceiptText() {
+      const t = state.activeReceipt;
+      if (!t) return;
+      const content = [
+        '====================================================',
+        '       SECUREPAY — OFFICIAL EVENT PAYMENT RECEIPT   ',
+        '====================================================',
+        `Transaction ID   : ${t.txnId}`,
+        `Razorpay Order   : ${t.orderId}`,
+        `Provider Pay ID  : ${t.razorpayPaymentId}`,
+        `Student Name     : ${t.studentName} (${t.rollNo})`,
+        `Student Email    : ${t.studentEmail}`,
+        `Event Registered : ${t.eventTitle}`,
+        `Amount Paid      : INR ${t.amount}.00`,
+        `Payment Method   : ${t.method}`,
+        `Status           : ${t.status} (Server Verified: ${t.verifiedByServer})`,
+        `Timestamp        : ${t.createdAt}`,
+        `Signature Proof  : ${t.signatureHash}`,
+        '====================================================',
+        'Note: Generated in Razorpay Test-Mode Environment.'
+      ].join('\n');
+      triggerFileDownload(`${t.txnId}_Receipt.txt`, content, 'text/plain');
+    }
+
+    function exportCSVReport() {
+      const headers = ['TransactionID', 'OrderID', 'PaymentID', 'StudentName', 'RollNo', 'Email', 'Event', 'AmountINR', 'Status', 'RefundStatus', 'ServerVerified', 'Timestamp'];
+      const rows = state.transactions.map(t => [
+        t.txnId, t.orderId, t.razorpayPaymentId, `"${t.studentName}"`, t.rollNo, t.studentEmail, `"${t.eventTitle}"`, t.amount, t.status, t.refundStatus, t.verifiedByServer, t.createdAt
+      ].join(','));
+      triggerFileDownload('SecurePay_Transactions_Report.csv', [headers.join(','), ...rows].join('\n'), 'text/csv');
+      showToast('Report Downloaded', 'CSV financial report exported.', 'success');
+    }
+
+    function triggerFileDownload(filename, content, mime) {
+      const blob = new Blob([content], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
